@@ -20,12 +20,12 @@ class lasso:
         s = ori_X.shape;
         self.n = s[1] * s[2];
         self.N = s[0];
-        #self.X = np.reshape(ori_X, (len(Y), self.n));
-        #self.Y = np.array(Y == 2, dtype=float);
-        #self.Y = np.reshape(self.Y, (self.N,1))
+        self.X = np.reshape(ori_X, (len(Y), self.n));
+        self.Y = np.array(Y == 2, dtype=float);
+        self.Y = np.reshape(self.Y, (self.N,1))
 
-        self.X_sparse = csc_matrix(np.reshape(ori_X, (len(Y), self.n)), shape=(self.N, self.n))
-        self.Y_sparse = csc_matrix(np.reshape(np.array(Y == 2, dtype=float), (self.N,1)), shape=(self.N, 1))
+        self.X_sparse = csr_matrix(self.X, shape=(self.N, self.n))#.toarray()
+        self.Y_sparse = csr_matrix(self.Y, shape=(self.N, 1))#.toarray()
 
         print("Loading data " + string + " complete....")
 
@@ -46,8 +46,7 @@ class lasso:
     def fit(self):
 
         # Initialization
-        #self.w = np.zeros( (self.n, 1) );
-        self.w = csc_matrix(np.zeros( (self.n, 1) ), shape=(self.n, 1));
+        self.w = np.zeros( (self.n, 1) );
         self.w0 = 0;
         self.iter = 0;
         converge = False;
@@ -56,28 +55,22 @@ class lasso:
         while not converge:
             self.iter += 1
             print ("Processing Iteration " + str(self.iter));
-            self.w_prev = csc_matrix.copy(self.w)
+            self.w_prev = np.copy(self.w);
             self.w0_prev = self.w0;
-            self.pred_y = self.X_sparse.dot(self.w) + self.w0;
-            self.w0 = (self.Y_sparse - self.pred_y).sum(axis=0) / self.N + self.w0
+            self.pred_y = np.dot(self.X_sparse, self.w) + self.w0;
+            self.w0 = np.sum(self.Y_sparse - self.pred_y) / self.N + self.w0
             self.pred_y = self.pred_y - self.w0_prev + self.w0;
 
             for k in range(0, self.n, 1):
-                print (str(k))
-                c = 2 * self.X_sparse[:, k].transpose().dot(self.Y_sparse - self.pred_y + self.X_sparse[:, k].dot(self.w[k]))
-                a = 2 * self.X_sparse[:, k].transpose().dot(self.X_sparse[:, k])
-
-                #c = 2 * np.dot(np.transpose(self.X_sparse[:,k]), (self.Y_sparse - self.pred_y + np.reshape(self.w[k] * self.X_sparse[:,k], (self.N, 1))))
-                #a = 2 * np.dot(np.transpose(self.X_sparse[:,k]), self.X_sparse[:,k]);
+                c = 2 * np.dot(np.transpose(self.X_sparse[:,k]), (self.Y_sparse - self.pred_y + np.reshape(self.w[k] * self.X_sparse[:,k], (self.N, 1))))
+                a = 2 * np.dot(np.transpose(self.X_sparse[:,k]), self.X_sparse[:,k]);
                 if c < -self.lamda:
-                    self.w[k, 0] = (c[0, 0] + self.lamda) / a[0, 0]
+                    self.w[k] = (c + self.lamda) / a;
                 elif c > self.lamda:
-                    self.w[k, 0] = (c[0, 0] - self.lamda) / a[0, 0]
+                    self.w[k] = (c - self.lamda) / a;
                 else:
-                    self.w[k, 0] = 0
-                self.pred_y = self.pred_y + self.X_sparse[:, k].dot(self.w[k] - self.w_prev[k])
-                #self.pred_y = self.pred_y + np.reshape(self.X_sparse[:, k] * (self.w[k] - self.w_prev[k]), (self.N, 1))
-                #self.pred_y = self.pred_y + np.reshape(self.X_sparse[:,k] * (self.w[k] - self.w_prev[k]), (self.N, 1))
+                    self.w[k] = 0
+                self.pred_y = self.pred_y + np.reshape(self.X_sparse[:,k] * (self.w[k] - self.w_prev[k]), (self.N, 1))
 
 
             abs_sum = max(abs(self.w_prev - self.w));
@@ -128,5 +121,6 @@ class lasso:
         self.Y = np.reshape(self.Y, (self.N, 1))
         self.X_sparse = csr_matrix(self.X, shape=(self.N, self.n )).toarray()
         self.Y_sparse = csr_matrix(self.Y, shape=(self.N, 1)).toarray()
+
 
 
