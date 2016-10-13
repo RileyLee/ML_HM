@@ -24,8 +24,8 @@ class lasso:
         self.Y = np.array(Y == 2, dtype=float);
         self.Y = np.reshape(self.Y, (self.N,1))
 
-        self.X_sparse = csr_matrix(self.X, shape=(self.N, self.n))#.toarray()
-        self.Y_sparse = csr_matrix(self.Y, shape=(self.N, 1))#.toarray()
+        self.X_sparse = csr_matrix(self.X, shape=(self.N, self.n)).toarray()
+        self.Y_sparse = csr_matrix(self.Y, shape=(self.N, 1)).toarray()
 
         print("Loading data " + string + " complete....")
 
@@ -37,8 +37,8 @@ class lasso:
         self.N = s[0];
         self.n = s[1];
         self.Y = np.reshape(self.Y, (self.N, 1))
-        self.X_sparse = csr_matrix(self.X, shape=(self.N, self.n))#.toarray()
-        self.Y_sparse = csr_matrix(self.Y, shape=(self.N, 1))#.toarray()
+        self.X_sparse = csr_matrix(self.X, shape=(self.N, self.n)).toarray()
+        self.Y_sparse = csr_matrix(self.Y, shape=(self.N, 1)).toarray()
 
     def mountName(self, featName):
         self.featName = featName;
