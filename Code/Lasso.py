@@ -24,7 +24,7 @@ class lasso:
         #self.Y = np.array(Y == 2, dtype=float);
         #self.Y = np.reshape(self.Y, (self.N,1))
 
-        self.X_sparse = csc_matrix(np.reshape(ori_X, (len(Y), self.n)), shape=(self.N, self.n))
+        self.X_sparse = csc_matrix(np.reshape(ori_X, (self.N, self.n)), shape=(self.N, self.n))
         self.Y_sparse = csc_matrix(np.reshape(np.array(Y == 2, dtype=float), (self.N,1)), shape=(self.N, 1))
 
         print("Loading data " + string + " complete....")
@@ -37,8 +37,8 @@ class lasso:
         self.N = s[0];
         self.n = s[1];
         self.Y = np.reshape(self.Y, (self.N, 1))
-        self.X_sparse = csr_matrix(self.X, shape=(self.N, self.n))#.toarray()
-        self.Y_sparse = csr_matrix(self.Y, shape=(self.N, 1))#.toarray()
+        self.X_sparse = csc_matrix(self.X, shape=(self.N, self.n))#.toarray()
+        self.Y_sparse = csc_matrix(self.Y, shape=(self.N, 1))#.toarray()
 
     def mountName(self, featName):
         self.featName = featName;
@@ -64,18 +64,23 @@ class lasso:
 
             for k in range(0, self.n, 1):
                 print (str(k))
-                c = 2 * self.X_sparse[:, k].transpose().dot(self.Y_sparse - self.pred_y + self.X_sparse[:, k].dot(self.w[k]))
-                a = 2 * self.X_sparse[:, k].transpose().dot(self.X_sparse[:, k])
+                c = self.X_sparse[:, k]
+                #c = 2 * self.X_sparse[:, k].transpose().dot(self.Y_sparse - self.pred_y + self.X_sparse[:, k].dot(self.w[k]))
+                #a = 2 * self.X_sparse[:, k].transpose().dot(self.X_sparse[:, k])
 
                 #c = 2 * np.dot(np.transpose(self.X_sparse[:,k]), (self.Y_sparse - self.pred_y + np.reshape(self.w[k] * self.X_sparse[:,k], (self.N, 1))))
                 #a = 2 * np.dot(np.transpose(self.X_sparse[:,k]), self.X_sparse[:,k]);
+                """
+
                 if c < -self.lamda:
                     self.w[k, 0] = (c[0, 0] + self.lamda) / a[0, 0]
                 elif c > self.lamda:
                     self.w[k, 0] = (c[0, 0] - self.lamda) / a[0, 0]
                 else:
                     self.w[k, 0] = 0
-                self.pred_y = self.pred_y + self.X_sparse[:, k].dot(self.w[k] - self.w_prev[k])
+
+                """
+                #self.pred_y = self.pred_y + self.X_sparse[:, k].dot(self.w[k] - self.w_prev[k])
                 #self.pred_y = self.pred_y + np.reshape(self.X_sparse[:, k] * (self.w[k] - self.w_prev[k]), (self.N, 1))
                 #self.pred_y = self.pred_y + np.reshape(self.X_sparse[:,k] * (self.w[k] - self.w_prev[k]), (self.N, 1))
 
