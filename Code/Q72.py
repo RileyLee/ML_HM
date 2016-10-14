@@ -5,7 +5,7 @@ import numpy as np
 model = lasso(1.5, 0.1, 0.985);
 
 model.load_data("training");
-model.fit();
+model.fit(True);
 
 outfile = TemporaryFile()
 np.savez(outfile, model.w)

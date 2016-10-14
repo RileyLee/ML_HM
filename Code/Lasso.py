@@ -43,7 +43,7 @@ class lasso:
     def mountName(self, featName):
         self.featName = featName;
 
-    def fit(self):
+    def fit(self, flag_print):
 
         # Initialization
         self.w = np.zeros( (self.n, 1) );
@@ -54,7 +54,8 @@ class lasso:
         # Start Iterations
         while not converge:
             self.iter += 1
-            print ("Processing Iteration " + str(self.iter));
+            if (flag_print):
+                print ("Processing Iteration " + str(self.iter));
             self.w_prev = np.copy(self.w);
             self.w0_prev = self.w0;
             self.pred_y = np.dot(self.X_sparse, self.w) + self.w0;
@@ -79,8 +80,10 @@ class lasso:
             #print("Error : " + str(sum(abs(self.pred_y - pred))))
             RMSE = np.sqrt(np.sum(np.power(self.Y - pred, 2)) / self.N);
 
-            print("Absolute sum : " + str(abs_sum))
-            print("RMSE : " + str(RMSE) + "   Leanring rate : " + str(self.lamda))
+            if (flag_print):
+                print("Absolute sum : " + str(abs_sum))
+                print("RMSE : " + str(RMSE) + "   Leanring rate : " + str(self.lamda))
+
 
             self.lamda *= self.decay;
 
@@ -106,16 +109,31 @@ class lasso:
         print ("RMSE : " + str(RMSE))
         return Err, Err_squre, RMSE
 
+    def evalRP(self):
+        TP = (self.w > 0) * (self.weight > 0)
+        TP.astype(float)
+        TP = np.sum(TP)
+        Pos = self.w > 0
+        Pos.astype(float)
+        Pos = np.sum(Pos)
+        True = self.weight > 0
+        True.astype(float)
+        True = np.sum(True)
+        Recall = np.float(TP) / np.float(Pos)
+        Precision = np.float(TP) / np.float(True)
+        return Recall, Precision
+
+
     def generate_data(self, N, d, k, sigma):
         self.N = N;
         self.n = d;
 
-        weight = np.ones((k,1)) * 10
-        weight = np.concatenate((weight, np.zeros((d-k,1))),axis=0)
-        weight0 = 0
+        self.weight = np.ones((k,1)) * 10
+        self.weight = np.concatenate((self.weight, np.zeros((d-k,1))),axis=0)
+        self.weight0 = 0
         rand = np.random.randn(N, d);
         self.X = np.copy(rand)
-        self.Y = weight0 + np.dot(rand, weight)
+        self.Y = self.weight0 + np.dot(rand, self.weight)
         rand = np.random.randn(N, 1)
         self.Y = self.Y + rand * sigma;
         self.Y = np.reshape(self.Y, (self.N, 1))
