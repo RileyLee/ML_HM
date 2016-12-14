@@ -1,6 +1,7 @@
 # Machine Learning Python Toolbox
 
 Author : Yuguang Lee -- University of Washington
+
 Email : ylee3@cs.washington.edu
 
 This project is a part of my machine learning class from the University of Washington. The goal is to implement different machine learning algorithms to classify the handwritten data.
